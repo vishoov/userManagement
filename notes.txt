@@ -1,0 +1,32 @@
+1. Nodemon -> restarting the server whenever there in any change
+
+2. Mongoose -> Mongoose is an ODM -> Object Data Modelling package 
+
+Designing the schemas 
+Validating the Data
+Error handling the Data
+Connecting the mongoDB server to our application
+
+Data errors might happen -> wrong email, wrong phone number, wrong password
+
+connections need to be fast
+processing power req should be less
+
+
+
+Process 
+
+
+request -> middlewars --> router -> calls the mongoose -> mongoose validates the Data
+
+-> mongoose sends the data to the database -> a status code is recieved 
+
+
+4. Error handling
+
+try{ //code here that might cause an error}
+catch(err){ //handle the error }
+
+
+server has to remain live 24x7
+
