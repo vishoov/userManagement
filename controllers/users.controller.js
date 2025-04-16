@@ -58,5 +58,161 @@ const getAllUsers = async (req, res)=>{
     }
 }
 
+const getId = async (req, res)=>{
+    try{
+        // const id = req.body.id;
+        const id = req.params.id;
+        const user = await User.findById(id);
 
-module.exports = { registerRoute, loginRoute, getAllUsers };
+        if(!user){
+            return res.status(404).send("User not found"); //if user is not found
+        }
+
+        res.status(200).json(user);
+
+
+
+        //mongoDB -> find, and findOne 
+        //mongoose -> findById, findByIdAndUpdate, findByIdAndDelete
+
+    }
+    catch(err){
+        res.status(500).send("Error in getting the user"); 
+    }
+}
+
+const updateUser = async (req, res) =>{
+    try{
+        //find the user by id and update the user
+        const id = req.params.id;
+
+        const newData = req.body; //get the data from the request body
+
+        const updatedUser = await User.findByIdAndUpdate(
+            id,// used to identify the user 
+            newData, // //data to be updated
+            { new: true } //return the updated user
+        )
+
+        if(!updatedUser){
+            return res.status(404).send("User not found"); //if user is not found
+        }
+
+        res.status(200).json(updatedUser);
+
+    }
+    catch(err){
+        res.status(500).send("Error in updating the user"); 
+    }
+}
+
+const deleteUser = async (req, res)=>{
+    try{
+        const id = req.params.id;
+
+        const deletedUser = await User.findByIdAndDelete(id);
+
+        res.status(200).json(deletedUser); //send the response
+    }
+    catch(Err){
+        res.status(500).send("Error in deleting the user");
+    }
+}
+
+
+const getUsersByAge = async (req, res)=>{
+    
+    try{
+        console.log("getUsersByAge called");
+        //grouped by age and count the number of users in each age group
+        //20 -> 5 users, 30 -> 10 users, 40 -> 15 users
+        //name, phone, age, phone number, email, password, role
+        //age: count
+        //age:count
+
+        //aggregation is set of commands -> query, group, project, sort, match, limit, skip
+        //we input an array of conditions and stages in the aggregate function, 
+        //and they are implemented step by step in the exact same order that they are given in
+
+        const users = await User.aggregate([
+            //stage 1 -> group the users by age and count the number of users in each age group 
+            {
+                // $group is used to group the documents in a collection by a specified field or fields
+                $group:{
+                    _id:"$age", //group by age 20, 30, 40, 50, 60, 70, 80, 90, 100
+                    count: { $sum: 1 } //count the number of users in each age group
+                    //20 years document we want the sum of all users in that age group
+                    //count the number of users in each age group 
+                }
+            }, 
+
+            //age:count 
+            // 30 : 10, 40 : 15, 20 : 5
+            //stage 2 -> sort the users by age in ascending order
+            {
+                $sort:{
+                    //age to be sorted in ascending order
+                    _id:1 //1 is used to sort in ascending order and -1 is used to sort in descending order
+                    
+                }
+            },
+            //stage 3 - project -> to reshape the documents in the pipeline
+            {
+                $project:{
+                    //  { age:20, count: 10 }
+                    _id:0, //exclude the _id field from the output
+                    age:"$_id", //include the age field in the output
+                    count:1 //include the count field in the output
+                }
+            }
+        ]);
+
+        if (users.length === 0) {
+            return res.status(404).send("No users found");
+          }
+        console.log(users);
+        res.status(200).json(users); //send the response
+    }
+    catch(err){
+        res.status(500).send('ahahahah');
+    }
+}
+
+
+
+//http://localhost:3000/search/emails?page=1&limit=10
+
+const getEmails = async (req, res)=>{
+    const page = parseInt(req.query.page) || 1; //get the page number from the query string
+    const limit = parseInt(req.query.limit) || 10; //get the limit from the query string
+    const skip = (page - 1) * limit; //calculate the number of documents to skip
+
+    try{
+        console.log("getEmails called");
+        const emails = await User.aggregate([
+            {
+            $project: {
+                _id: 0, // exclude the _id field from the output
+                email: 1 // include only the email field in the output
+
+            }
+            }
+        ])
+        .skip(skip).limit(limit) //limit the number of emails to 10 and skip the first 0 emails
+
+        //sequentially 
+
+        if (emails.length === 0) {
+            return res.status(404).send("No users found");
+          }
+        console.log(emails);
+        res.status(200).json(emails); //send the response
+    }
+    catch(err){
+        res.status(500).send("Error in getting the emails"); //if there is an error in getting the emails
+    }
+}
+
+
+
+module.exports = { registerRoute, loginRoute, getAllUsers, getId, updateUser, deleteUser, getUsersByAge, getEmails };

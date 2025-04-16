@@ -17,6 +17,10 @@ processing power req should be less
 Process 
 
 
+
+
+
+
 request -> middlewars --> router -> calls the mongoose -> mongoose validates the Data
 
 -> mongoose sends the data to the database -> a status code is recieved 
@@ -30,3 +34,30 @@ catch(err){ //handle the error }
 
 server has to remain live 24x7
 
+
+
+https://github.com/vishoov/userManagement
+
+Whenever we have any product whose business model depends on
+any kind of data and we want to implement any data related features in an efficient and scalable manner, we use databases
+NO DATA LOST -> proper handling
+NO DATA STOLEN  -> proper security 
+
+1. CRUD Operations 
+
+
+        CRUD -> Create, Read, Update, Delete 
+
+        User Management -> features dependant on the data
+
+            signup -> post user info in the database
+            login -> ask for authentication match the email and password
+            getAllUsers -> to get a picture of your whole product
+
+        Create -> signup 
+        Read -> login, getusers, profile
+        Update -> update a password, update profile picture
+        Delete -> delete account, delete any product or delete  review
+
+
+        Aggregation Queries  

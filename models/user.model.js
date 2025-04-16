@@ -40,7 +40,13 @@ const userSchema = new mongoose.Schema({
         maxLength:20, //maximum length of password is 20
         
     },
-
+    age:{
+        type:Number,
+        required:true,
+        min:1, //minimum age is 1
+        max:100, //maximum age is 100
+        
+    },
     role:{
         type:String,
         enum:["user", "admin"], //user or admin //enum is used to define the valid
