@@ -1,4 +1,8 @@
 const User = require("../models/user.model"); //import the user model
+const { createToken } = require("../auth/auth.middleware"); //import the createToken function from auth middleware
+const validator = require("validator"); //import the validator library for data validation
+const { xss } = require("xss");
+
 
 const registerRoute = async (req, res)=>{
     try{
@@ -7,10 +11,16 @@ const registerRoute = async (req, res)=>{
 
     // const newUser = await new User(user); //create a new user object
     const newUser = await User.create(user);
-    res.status(201).send(`User ${newUser.name} registered successfully`); //send the response
+
+    const token = createToken(newUser); //create a token for the user
+    res.status(201).json({
+        message:`User ${newUser.name} registered successfully`, //send the response
+        user:newUser,
+        token:token //send the user object in the response
+    }) //send the response
     }
     catch(err){
-        res.status(500).send("Error in registering the user"); //if there is an error in registering the user
+        res.status(500).send(err); //if there is an error in registering the user
     }
 }
 
@@ -19,8 +29,18 @@ const loginRoute = async (req, res)=>{
 
     try{
     const { email, password } = req.body;
+
+        //review on a product -> review title, de
+        //title= xss("<script>alert('xss')</script>") //xss attack
+
+
+    if(!validator.isEmail(email)){
+        return res.status(400).send("Invalid email format"); //if the email is not valid
+    }
+
     //username, password or email password 
     const user = await User.findOne({email:email});
+
      
     if(!user){
         return res.status(404).send("User not found"); //if user is not found
@@ -28,15 +48,18 @@ const loginRoute = async (req, res)=>{
 
     //error handle and if the user doesnt exist throw the error
 
-    if(user.password !== password){
-        return res.status(401).send("Invalid password"); //if password is not correct
-    }
 
+    if(!await user.comparePassword(password)){
+        return res.status(401).send("Invalid password"); //if the password does not match 
+    }
+    //compare the password with the hashed password in the database
+
+    const token = createToken(user); //create a token for the user
 
     //if the password does not match -> password invalid 
 
 
-    res.status(201).send(`Logged in successfuly as ${user.name}`); //send the response
+    res.status(201).send(`Logged in successfuly as ${user.name}, ${token}`); //send the response
 }
 catch(err){
     res.status(500).send("Error in logging in the user"); //if there is an error in logging in the user

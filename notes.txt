@@ -46,6 +46,9 @@ NO DATA STOLEN  -> proper security
 1. CRUD Operations 
 
 
+
+
+
         CRUD -> Create, Read, Update, Delete 
 
         User Management -> features dependant on the data
@@ -61,3 +64,16 @@ NO DATA STOLEN  -> proper security
 
 
         Aggregation Queries  
+
+
+
+
+        https://jwt.io/introduction
+
+
+        Bcrypt-> password encrytpion
+        jwt -> user authentication
+        .env -> environment variables
+        helmet.js-> security headers 
+        validator -> input validation and sanitization
+        xss-> to prevent cross site scripting 
